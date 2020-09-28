@@ -1,0 +1,44 @@
+body {
+    font-family: 'Raleway', sans-serif;
+}
+
+#playArea {
+    width: 30em;
+    height: 30em;
+    margin: 10vh auto;
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+.cell {
+    background-color: white;
+    border: 0.5em solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-cellNum = '0'], 
+[data-cellNum = '1'],
+[data-cellNum = '2'] {
+    border-top: none;
+}
+
+[data-cellNum = '2'], 
+[data-cellNum = '5'],
+[data-cellNum = '8']{
+    border-right: none;
+}
+
+[data-cellNum = '0'], 
+[data-cellNum = '3'], 
+[data-cellNum = '6']  {
+    border-left: none;
+}
+
+[data-cellNum = '6'],
+[data-cellNum = '7'],
+[data-cellNum = '8'] {
+    border-bottom: none;
+}
+
