@@ -7,15 +7,19 @@ body {
     height: 30em;
     margin: 10vh auto;
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
 }
 
 .cell {
     background-color: white;
-    border: 0.5em solid black;
+    border: 0.25rem solid black;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 6rem;
+    margin: 0;
+    padding: 0;
 }
 
 [data-cellNum = '0'], 

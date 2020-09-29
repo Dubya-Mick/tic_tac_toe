@@ -1,27 +1,13 @@
 const gameBoard = (() => {
     let gameArray = ['', '', '', '', '', '', '', '', ''];
 
-    const displayBoard = () => {
-        let playArea = document.getElementById("playArea");
-        let cells = document.createDocumentFragment();
-        for(let i = 0; i < 9; i++) {
-            let cell = document.createElement('div');
-            cell.setAttribute("data-cellNum", `${i}`);
-            cell.classList.add('cell');
-            cell.textContent = gameArray[i];
-            cells.appendChild(cell);
-        }
-        playArea.appendChild(cells);
-    }
-
-
     const checkColumn = () => {
         let leftColumn = gameArray[0] + gameArray[3] + gameArray[6];
         let midColumn = gameArray[1] + gameArray[4] + gameArray[7];
         let rightColumn = gameArray[2] + gameArray[5] + gameArray[8];
         if (leftColumn == "XXX" || midColumn == "XXX" || rightColumn == "XXX") {
             //player wins
-        } else if (leftColumn == "000" || midColumn == "000" || rightColumn == "000") {
+        } else if (leftColumn == "OOO" || midColumn == "OOO" || rightColumn == "OOO") {
             //computer wins
         }
     }
@@ -32,7 +18,7 @@ const gameBoard = (() => {
         let bottomwRow = gameArray[6] + gameArray[7] + gameArray[8];
         if (topRow == "XXX" || midRow == "XXX" || bottomwRow == "XXX") {
             //player wins
-        } else if (topRow == "000" || midRow == "000" || bottomwRow == "000") {
+        } else if (topRow == "OOO" || midRow == "OOO" || bottomwRow == "OOO") {
             //computer wins
         }
     }
@@ -42,9 +28,67 @@ const gameBoard = (() => {
         let leftUp = gameArray[6] + gameArray[4] + gameArray[2];
         if (leftDown == "XXX" || leftUp == "XXX") {
             //player wins
-        } else if (leftDown == "000" || leftUp == "000") {
+        } else if (leftDown == "OOO" || leftUp == "OOO") {
             //computer wins 
         }
+    }
+
+    const displayBoard = () => {
+        let playArea = document.getElementById("playArea");
+        let allCells = document.createDocumentFragment();
+        for(let i = 0; i < 9; i++) {
+            let cell = document.createElement('div');
+            cell.setAttribute("data-cellNum", `${i}`);
+            cell.classList.add('cell');
+            cell.textContent = gameArray[i];
+            cell.addEventListener('click', (e) => {
+                playerMove(e);
+                computerMove();
+                displayBoard();
+            });
+            allCells.appendChild(cell);
+        }
+        clearBoardDisplay(playArea);
+        playArea.appendChild(allCells);
+    }
+
+    const clearBoardDisplay = (parent) => {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild)
+        }
+    
+    }
+
+    const getIndexOfFreeCell = () => {
+        freeCellIndexes = [];
+        for (let i = 0; i < gameArray.length; i++) {
+            if (gameArray[i] == '') {
+                freeCellIndexes.push(i);
+            }
+        }
+        let randomFreeIndex = freeCellIndexes[Math.floor(Math.random()*freeCellIndexes.length)];
+        return randomFreeIndex;
+    }
+
+    const playerMove = (e) => {
+        if (e.target.textContent == "") {
+            let gameArrayIndex = e.target.getAttribute('data-cellNum');
+            gameArray[gameArrayIndex] = "X";
+        } else {
+            alert("No can do!");
+        }
+        
+    }
+
+    const computerMove = () => {
+        let randomFreeCellIndex = getIndexOfFreeCell();
+        gameArray[randomFreeCellIndex] = "0";
+    }
+
+   
+
+    const playerClick = () => {
+
     }
 
     const playerWins = () => {
@@ -61,10 +105,9 @@ const gameBoard = (() => {
         gameArray = ['', '', '', '', '', '', '', '', ''];
     }
 
-    return {displayBoard};
+    return {displayBoard, gameArray, getIndexOfFreeCell};
 
 })();
-
 
 gameBoard.displayBoard();
 
