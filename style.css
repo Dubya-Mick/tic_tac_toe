@@ -2,6 +2,51 @@ body {
     font-family: 'Raleway', sans-serif;
 }
 
+.choose-game-mode {
+    width: 20rem;
+    margin: 10vh auto;
+    text-align: center;
+    z-index: 1;
+    display: block;
+}
+
+.hide-choose-game-mode {
+    display: none;
+}
+
+.mode-button-wrapper {
+    width: 20rem;
+    height: 10rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    
+}
+
+.mode-button-wrapper div {
+    outline: 1px solid black;
+    padding: 1rem;
+    cursor: pointer;
+    width: 15rem;
+    margin: 0 auto;
+}
+
+.player-menu {
+    display: none;
+}
+
+#start-button {
+    margin: 1rem;
+    cursor: pointer;
+}
+
+.display-player-menu {
+    display: block;
+}
+
+
+
+
 #playArea {
     width: 30em;
     height: 30em;
