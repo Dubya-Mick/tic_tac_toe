@@ -1,6 +1,10 @@
 const gameBoard = (() => {
     let gameArray = ['', '', '', '', '', '', '', '', ''];
     let gameOver = false;
+    let aiGame = false; 
+    let player1;
+    let player2;
+    let currentPlayer;
 
     //function that checks column for win
     const checkColumn = () => {
@@ -8,9 +12,17 @@ const gameBoard = (() => {
         let midColumn = gameArray[1] + gameArray[4] + gameArray[7];
         let rightColumn = gameArray[2] + gameArray[5] + gameArray[8];
         if (leftColumn == "XXX" || midColumn == "XXX" || rightColumn == "XXX") {
-            playerWins();
+            if (gameBoard.aiGame == true) {
+                humanWins();
+            } else {
+                gameBoard.player1.winRound();
+            }
         } else if (leftColumn == "OOO" || midColumn == "OOO" || rightColumn == "OOO") {
-            computerWins();
+            if (gameBoard.aiGame == true) {
+                aiWins();
+            } else {
+               gameBoard.player2.winRound();
+            }
         }
     }
 
@@ -20,21 +32,39 @@ const gameBoard = (() => {
         let midRow = gameArray[3] + gameArray[4] + gameArray[5];
         let bottomwRow = gameArray[6] + gameArray[7] + gameArray[8];
         if (topRow == "XXX" || midRow == "XXX" || bottomwRow == "XXX") {
-            playerWins();
+            if (gameBoard.aiGame == true) {
+                humanWins();
+            } else {
+                gameBoard.player1.winRound();
+            }
         } else if (topRow == "OOO" || midRow == "OOO" || bottomwRow == "OOO") {
-            computerWins();
+            if (gameBoard.aiGame == true) {
+                aiWins();
+            } else {
+                gameBoard.player2.winRound();
+            }
         }
     }
+
     //function that checks diagonal for win
     const checkDiagonal = () => {
         let leftDown = gameArray[0] + gameArray[4] + gameArray[8];
         let leftUp = gameArray[6] + gameArray[4] + gameArray[2];
         if (leftDown == "XXX" || leftUp == "XXX") {
-            playerWins();
+            if (gameBoard.aiGame == true) {
+                humanWins();
+            } else {
+                gameBoard.player1.winRound();
+            }
         } else if (leftDown == "OOO" || leftUp == "OOO") {
-            computerWins(); 
+            if (gameBoard.aiGame == true) {
+                aiWins();
+            } else {
+                gameBoard.player2.winRound();
+            }
         }
     }
+
     //function that checks for a tie
     //timeout provides time for the browser to paint markers
     const checkForTie = () => {
@@ -47,6 +77,7 @@ const gameBoard = (() => {
         }, 250);
         
     }
+
     //function that adds divs to playArea to represent the gameboard
     const displayBoard = () => {
         let playArea = document.getElementById("playArea");
@@ -56,10 +87,15 @@ const gameBoard = (() => {
             cell.setAttribute("data-cellNum", `${i}`);
             cell.classList.add('cell');
             cell.textContent = gameArray[i];
-            cell.addEventListener('click', (e) => {
-                playerClick(e);
-                displayBoard();
-            });
+            if (gameBoard.aiGame == true) {
+                cell.addEventListener('click', (e) => {
+                    clickVsAi(e);
+                });
+            } else {
+                cell.addEventListener('click', (e) => {
+                    clickPVP(e);
+                });
+            }
             allCells.appendChild(cell);
         }
         clearBoardDisplay(playArea);
@@ -87,14 +123,14 @@ const gameBoard = (() => {
     }
 
     //function that controls a player's choice of move
-    const playerMove = (e) => {
+    const humanMove = (e) => {
         let gameArrayIndex = e.target.getAttribute('data-cellNum');
         gameArray[gameArrayIndex] = "X";
         
     }
 
     //function that grabs a free space index and chooses it for the AI's play
-    const computerMove = () => {
+    const aiMove = () => {
         if (gameOver == false) {
             let randomFreeCellIndex = getIndexOfFreeCell();
             gameArray[randomFreeCellIndex] = "O";
@@ -103,18 +139,21 @@ const gameBoard = (() => {
     }
 
     //function that controls the order of events on a player click against the computer 
-    const playerClick = (e) => {
+    const clickVsAi = (e) => {
         if (e.target.textContent == "") {
-            playerMove(e);
+            humanMove(e);
+            aiMove();
+            displayBoard();
             checkColumn();
             checkDiagonal();
             checkRow();
             checkForTie();
-            computerMove();
+            
         } else {
             alert("Choose a free cell, bro!");
         }
     }
+
 
     const restartGame = () => {
         gameArray = ['', '', '', '', '', '', '', '', ''];
@@ -122,7 +161,7 @@ const gameBoard = (() => {
         displayBoard();
     }
 
-    const playerWins = () => {
+    const humanWins = () => {
         gameOver = true;
         window.setTimeout(function() {
             alert("You win this round!");
@@ -131,7 +170,7 @@ const gameBoard = (() => {
          
     }
 
-    const computerWins = () => {
+    const aiWins = () => {
         gameOver = true;
         window.setTimeout(function() {
             alert("Computer wins this round!");
@@ -140,46 +179,113 @@ const gameBoard = (() => {
         
     }
 
-    return {displayBoard};
+    const toggleCurrentPlayer = () => {
+        if (gameBoard.currentPlayer == gameBoard.player1.getName()) {
+            gameBoard.currentPlayer = gameBoard.player2.getName();
+        } else {
+            gameBoard.currentPlayer = gameBoard.player1.getName();
+        }
+    }
+
+    
+    const clickPVP = (e) => {
+        if (e.target.textContent == '' && gameBoard.currentPlayer == gameBoard.player1.getName()) {
+            gameBoard.player1.placeMarker(e);
+        } else if (e.target.textContent == '' && gameBoard.currentPlayer == gameBoard.player2.getName()) {
+            gameBoard.player2.placeMarker(e);
+        }
+        toggleCurrentPlayer();
+        displayBoard();
+        checkColumn();
+        checkDiagonal();
+        checkRow();
+        checkForTie();
+    }
+
+
+    return {displayBoard, player1, player2, aiGame, gameArray, currentPlayer, restartGame};
 
 })();
 
 
 
 
-const playerFactory = (name) => {
-    const getName = () => {
-
+const player = (name, marker) => {
+    let score = 0;
+    const getName = () => name;
+    const getMarker = () => marker;
+    const placeMarker = (e) => {
+        let gameArrayIndex = e.target.getAttribute('data-cellNum');
+        gameBoard.gameArray[gameArrayIndex] = getMarker();
     }
+    const winRound = () => {
+        window.setTimeout(function() {
+            alert(`${name} wins!`);
+            gameBoard.restartGame();
+        }, 250);
+
+
+        
+    }
+
+    return {score, getName, getMarker, placeMarker, winRound}
 }
 
 
 
 
-const displayController = (() => {
-    let gameModeMenu = document.querySelector('.choose-game-mode');
-    let humanGameButton = document.getElementById('human-game');
-    let aiGameButton = document.getElementById('AI-game');
-    let nameInput = document.querySelector('.player-menu');
 
-    let playerScore = 0;
-    let computerScore = 0;
+const displayController = (() => {
+
+    const toggleNameInputMenu = () => {
+        let nameInput = document.querySelector('.player-menu');
+        nameInput.classList.toggle('display-player-menu');
+    }
+
+    const hideChooseGameMode = () => {
+        let gameModeMenu = document.querySelector('.choose-game-mode');
+        gameModeMenu.classList.add('hide-choose-game-mode');
+    }
 
     const showPlayerInput = () => {
-        humanGameButton.addEventListener('click', () => {
-            nameInput.classList.toggle('display-player-menu');
-        });
+        let humanGameButton = document.getElementById('human-game');
+        humanGameButton.addEventListener('click', toggleNameInputMenu);
     }
 
     const startAIGame = () => {
+        let aiGameButton = document.getElementById('AI-game');
         aiGameButton.addEventListener('click', () => {
-            gameModeMenu.classList.add('hide-choose-game-mode');
+            hideChooseGameMode();
+            gameBoard.aiGame = true;
             gameBoard.displayBoard();
         })
     }
 
-    return {showPlayerInput, startAIGame}
+    const createPlayers = () => {
+        let player1Name = document.getElementById('player-1').value;
+        let player2Name = document.getElementById('player-2').value;
+        if (player1Name == '' || player2Name == '') {
+            alert('Make sure to fill in player names!');
+        } else {
+            gameBoard.player1 = player(player1Name, "X");
+            gameBoard.player2 = player(player2Name, "O");
+            gameBoard.currentPlayer = gameBoard.player1.getName();
+            hideChooseGameMode();            
+        }
+
+    }
+
+    const startHumanGame = () => {
+        let startHumanGameButton = document.querySelector('#start-button');
+        startHumanGameButton.addEventListener('click', () => {
+            createPlayers();
+            gameBoard.displayBoard();
+        })
+    }
+
+    return {showPlayerInput, startAIGame, startHumanGame}
 })();
 
 displayController.showPlayerInput();
 displayController.startAIGame();
+displayController.startHumanGame();
