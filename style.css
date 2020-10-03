@@ -45,13 +45,11 @@ body {
 }
 
 
-
-
 #playArea {
     width: 30em;
     height: 30em;
     margin: 10vh auto;
-    display: grid;
+    display: none;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
 }
@@ -91,3 +89,19 @@ body {
     border-bottom: none;
 }
 
+#player-info {
+    width: 30rem;
+    margin: 3rem auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#restart-button {
+    width: 10rem;
+    margin: 1rem auto;
+    display: none;
+    outline: 1px solid black;
+    text-align: center;
+    cursor: pointer;
+}

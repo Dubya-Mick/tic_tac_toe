@@ -158,6 +158,10 @@ const gameBoard = (() => {
     const restartGame = () => {
         gameArray = ['', '', '', '', '', '', '', '', ''];
         gameOver = false;
+        if(!aiGame) {
+            displayController.player2NameDisplay.style.fontSize = '';
+            displayController.player1NameDisplay.style.fontSize = '2rem';
+        }
         displayBoard();
     }
 
@@ -181,9 +185,14 @@ const gameBoard = (() => {
 
     const toggleCurrentPlayer = () => {
         if (gameBoard.currentPlayer == gameBoard.player1.getName()) {
+            displayController.player1NameDisplay.style.fontSize = '';
             gameBoard.currentPlayer = gameBoard.player2.getName();
+            displayController.player2NameDisplay.style.fontSize = '2rem';
         } else {
             gameBoard.currentPlayer = gameBoard.player1.getName();
+            displayController.player2NameDisplay.style.fontSize = '';
+            displayController.player1NameDisplay.style.fontSize = '2rem';
+
         }
     }
 
@@ -203,11 +212,15 @@ const gameBoard = (() => {
     }
 
 
-    return {displayBoard, player1, player2, aiGame, gameArray, currentPlayer, restartGame};
+    return {displayBoard, 
+            player1, 
+            player2, 
+            aiGame, 
+            gameArray, 
+            currentPlayer, 
+            restartGame};
 
 })();
-
-
 
 
 const player = (name, marker) => {
@@ -231,11 +244,12 @@ const player = (name, marker) => {
     return {score, getName, getMarker, placeMarker, winRound}
 }
 
-
-
-
-
 const displayController = (() => {
+    let playArea = document.getElementById('playArea');
+    let gameModeMenu = document.querySelector('.choose-game-mode');
+    let restartButton = document.getElementById('restart-button');
+    let player1NameDisplay = document.getElementById('player-1-name');
+    let player2NameDisplay = document.getElementById('player-2-name');
 
     const toggleNameInputMenu = () => {
         let nameInput = document.querySelector('.player-menu');
@@ -243,8 +257,19 @@ const displayController = (() => {
     }
 
     const hideChooseGameMode = () => {
-        let gameModeMenu = document.querySelector('.choose-game-mode');
         gameModeMenu.classList.add('hide-choose-game-mode');
+    }
+
+    const showChooseGameMode = () => {
+        gameModeMenu.classList.remove('hide-choose-game-mode');
+    }
+
+    const showPlayArea = () => {
+        playArea.style.display = 'grid';
+    }
+
+    const hidePlayArea = () => {
+        playArea.style.display = 'none';
     }
 
     const showPlayerInput = () => {
@@ -252,11 +277,23 @@ const displayController = (() => {
         humanGameButton.addEventListener('click', toggleNameInputMenu);
     }
 
+    const showRestartButton = () => {
+        restartButton.style.display = 'block';
+    }
+
+    const restart = () => {
+        restartButton.addEventListener('click', () => {
+            window.location.reload();
+        })
+    }
+
     const startAIGame = () => {
         let aiGameButton = document.getElementById('AI-game');
         aiGameButton.addEventListener('click', () => {
             hideChooseGameMode();
             gameBoard.aiGame = true;
+            showPlayArea();
+            showRestartButton();
             gameBoard.displayBoard();
         })
     }
@@ -270,22 +307,36 @@ const displayController = (() => {
             gameBoard.player1 = player(player1Name, "X");
             gameBoard.player2 = player(player2Name, "O");
             gameBoard.currentPlayer = gameBoard.player1.getName();
-            hideChooseGameMode();            
+            player1NameDisplay.textContent = `${player1Name}: X`;
+            player1NameDisplay.style.fontSize = '2rem';
+            player2NameDisplay.textContent = `${player2Name}: O`;
+            hideChooseGameMode();           
         }
-
     }
 
     const startHumanGame = () => {
         let startHumanGameButton = document.querySelector('#start-button');
         startHumanGameButton.addEventListener('click', () => {
             createPlayers();
+            showPlayArea();
+            showRestartButton();
             gameBoard.displayBoard();
         })
     }
 
-    return {showPlayerInput, startAIGame, startHumanGame}
+    return {showPlayerInput, 
+            startAIGame, 
+            startHumanGame, 
+            restart,
+            player1NameDisplay, 
+            player2NameDisplay}
 })();
 
 displayController.showPlayerInput();
 displayController.startAIGame();
 displayController.startHumanGame();
+displayController.restart();
+
+
+
+//problem: two gamearrays are getting created. I think I need to use the this keyword
