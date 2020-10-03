@@ -8,9 +8,9 @@ const gameBoard = (() => {
 
     //function that checks column for win
     const checkColumn = () => {
-        let leftColumn = gameArray[0] + gameArray[3] + gameArray[6];
-        let midColumn = gameArray[1] + gameArray[4] + gameArray[7];
-        let rightColumn = gameArray[2] + gameArray[5] + gameArray[8];
+        let leftColumn = gameBoard.gameArray[0] + gameBoard.gameArray[3] + gameBoard.gameArray[6];
+        let midColumn = gameBoard.gameArray[1] + gameBoard.gameArray[4] + gameBoard.gameArray[7];
+        let rightColumn = gameBoard.gameArray[2] + gameBoard.gameArray[5] + gameBoard.gameArray[8];
         if (leftColumn == "XXX" || midColumn == "XXX" || rightColumn == "XXX") {
             if (gameBoard.aiGame == true) {
                 humanWins();
@@ -28,9 +28,9 @@ const gameBoard = (() => {
 
     //function that checks row for win
     const checkRow = () => {
-        let topRow = gameArray[0] + gameArray[1] + gameArray[2];
-        let midRow = gameArray[3] + gameArray[4] + gameArray[5];
-        let bottomwRow = gameArray[6] + gameArray[7] + gameArray[8];
+        let topRow = gameBoard.gameArray[0] + gameBoard.gameArray[1] + gameBoard.gameArray[2];
+        let midRow = gameBoard.gameArray[3] + gameBoard.gameArray[4] + gameBoard.gameArray[5];
+        let bottomwRow = gameBoard.gameArray[6] + gameBoard.gameArray[7] + gameBoard.gameArray[8];
         if (topRow == "XXX" || midRow == "XXX" || bottomwRow == "XXX") {
             if (gameBoard.aiGame == true) {
                 humanWins();
@@ -48,8 +48,8 @@ const gameBoard = (() => {
 
     //function that checks diagonal for win
     const checkDiagonal = () => {
-        let leftDown = gameArray[0] + gameArray[4] + gameArray[8];
-        let leftUp = gameArray[6] + gameArray[4] + gameArray[2];
+        let leftDown = gameBoard.gameArray[0] + gameBoard.gameArray[4] + gameBoard.gameArray[8];
+        let leftUp = gameBoard.gameArray[6] + gameBoard.gameArray[4] + gameBoard.gameArray[2];
         if (leftDown == "XXX" || leftUp == "XXX") {
             if (gameBoard.aiGame == true) {
                 humanWins();
@@ -70,7 +70,7 @@ const gameBoard = (() => {
     const checkForTie = () => {
         window.setTimeout(() => {
             const isTaken = (cell) => cell != "";
-            if (gameArray.every(isTaken) && gameOver == false) {
+            if (gameBoard.gameArray.every(isTaken) && gameOver == false) {
                 alert("Tie!");
                 restartGame();
             }
@@ -87,6 +87,7 @@ const gameBoard = (() => {
             cell.setAttribute("data-cellNum", `${i}`);
             cell.classList.add('cell');
             cell.textContent = gameArray[i];
+            cell.textContent = gameBoard.gameArray[i];
             if (gameBoard.aiGame == true) {
                 cell.addEventListener('click', (e) => {
                     clickVsAi(e);
@@ -113,8 +114,8 @@ const gameBoard = (() => {
     //function that grabs the index of a random free cell for the 'AI'
     const getIndexOfFreeCell = () => {
         freeCellIndexes = [];
-        for (let i = 0; i < gameArray.length; i++) {
-            if (gameArray[i] == '') {
+        for (let i = 0; i < gameBoard.gameArray.length; i++) {
+            if (gameBoard.gameArray[i] == '') {
                 freeCellIndexes.push(i);
             }
         }
@@ -125,7 +126,7 @@ const gameBoard = (() => {
     //function that controls a player's choice of move
     const humanMove = (e) => {
         let gameArrayIndex = e.target.getAttribute('data-cellNum');
-        gameArray[gameArrayIndex] = "X";
+        gameBoard.gameArray[gameArrayIndex] = "X";
         
     }
 
@@ -133,7 +134,7 @@ const gameBoard = (() => {
     const aiMove = () => {
         if (gameOver == false) {
             let randomFreeCellIndex = getIndexOfFreeCell();
-            gameArray[randomFreeCellIndex] = "O";
+            gameBoard.gameArray[randomFreeCellIndex] = "O";
         }
         
     }
@@ -156,11 +157,12 @@ const gameBoard = (() => {
 
 
     const restartGame = () => {
-        gameArray = ['', '', '', '', '', '', '', '', ''];
+        gameBoard.gameArray = ['', '', '', '', '', '', '', '', ''];
         gameOver = false;
-        if(!aiGame) {
+        if(!gameBoard.aiGame) {
             displayController.player2NameDisplay.style.fontSize = '';
             displayController.player1NameDisplay.style.fontSize = '2rem';
+            gameBoard.currentPlayer = gameBoard.player1.getName();
         }
         displayBoard();
     }
