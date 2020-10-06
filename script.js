@@ -71,8 +71,9 @@ const gameBoard = (() => {
         window.setTimeout(() => {
             const isTaken = (cell) => cell != "";
             if (gameBoard.gameArray.every(isTaken) && gameOver == false) {
-                alert("Tie!");
-                restartGame();
+                let winDisplay = document.querySelector('#winner-display');
+                winDisplay.textContent = 'Tie.';
+                displayController.showWinner();
             }
         }, 250);
         
@@ -155,7 +156,7 @@ const gameBoard = (() => {
         }
     }
 
-
+    //function that restarts the game for a new round
     const restartGame = () => {
         gameBoard.gameArray = ['', '', '', '', '', '', '', '', ''];
         gameOver = false;
@@ -167,24 +168,29 @@ const gameBoard = (() => {
         displayBoard();
     }
 
+    //function that controls a human win against the AI
     const humanWins = () => {
         gameOver = true;
         window.setTimeout(function() {
-            alert("You win this round!");
-            restartGame();
+            let winDisplay = document.querySelector('#winner-display');
+            winDisplay.textContent = 'You win.';
+            displayController.showWinner();
          }, 250);
          
     }
 
+    //function that controls an AI win
     const aiWins = () => {
         gameOver = true;
         window.setTimeout(function() {
-            alert("Computer wins this round!");
-            restartGame();
+            let winDisplay = document.querySelector('#winner-display');
+            winDisplay.textContent = 'The AI wins.';
+            displayController.showWinner();
         }, 250);
         
     }
 
+    //function that toggles the current player 
     const toggleCurrentPlayer = () => {
         if (gameBoard.currentPlayer == gameBoard.player1.getName()) {
             displayController.player1NameDisplay.style.fontSize = '';
@@ -198,7 +204,7 @@ const gameBoard = (() => {
         }
     }
 
-    
+    //function that hands the logic of a pvp click
     const clickPVP = (e) => {
         if (e.target.textContent == '' && gameBoard.currentPlayer == gameBoard.player1.getName()) {
             gameBoard.player1.placeMarker(e);
@@ -229,18 +235,19 @@ const player = (name, marker) => {
     let score = 0;
     const getName = () => name;
     const getMarker = () => marker;
+    //function that handles the placement of markers for pvp
     const placeMarker = (e) => {
         let gameArrayIndex = e.target.getAttribute('data-cellNum');
         gameBoard.gameArray[gameArrayIndex] = getMarker();
     }
+    //function that handles a player win
     const winRound = () => {
         window.setTimeout(function() {
-            alert(`${name} wins!`);
+            displayController.showWinner();
+            let winDisplay = document.querySelector('#winner-display');
+            winDisplay.textContent = `${name} wins!`;
             gameBoard.restartGame();
         }, 250);
-
-
-        
     }
 
     return {score, getName, getMarker, placeMarker, winRound}
@@ -252,54 +259,70 @@ const displayController = (() => {
     let restartButton = document.getElementById('restart-button');
     let player1NameDisplay = document.getElementById('player-1-name');
     let player2NameDisplay = document.getElementById('player-2-name');
+    let winBackground = document.querySelector('.win-display-background');
 
+    //function that toggles name input menu for pvp
     const toggleNameInputMenu = () => {
         let nameInput = document.querySelector('.player-menu');
         nameInput.classList.toggle('display-player-menu');
     }
 
+    //function that hides main menu during gameplay
     const hideChooseGameMode = () => {
         gameModeMenu.classList.add('hide-choose-game-mode');
     }
 
-    const showChooseGameMode = () => {
-        gameModeMenu.classList.remove('hide-choose-game-mode');
-    }
-
+    //function that shows the tic tac toe board
     const showPlayArea = () => {
         playArea.style.display = 'grid';
     }
 
-    const hidePlayArea = () => {
-        playArea.style.display = 'none';
-    }
-
+    //adds the name input menu toggle to human game button click
     const showPlayerInput = () => {
         let humanGameButton = document.getElementById('human-game');
         humanGameButton.addEventListener('click', toggleNameInputMenu);
     }
 
+    //reveals the main menu restart button
     const showRestartButton = () => {
         restartButton.style.display = 'block';
     }
 
+    //function that pulls up the modal showing the winner
+    const showWinner = () => {
+        winBackground.style.display = 'block';
+    }
+
+    //button that allows you to start a new round after a win
+    const newRoundButton = () => {
+        let newRoundStartButton = document.querySelector('#new-round-button');
+        newRoundStartButton.addEventListener('click', () => {
+            winBackground.style.display = 'none';
+            gameBoard.restartGame();
+        })
+    }
+
+    //back to main menu
     const restart = () => {
         restartButton.addEventListener('click', () => {
             window.location.reload();
         })
     }
 
+    //starts a game against the AI
     const startAIGame = () => {
         let aiGameButton = document.getElementById('AI-game');
         aiGameButton.addEventListener('click', () => {
             hideChooseGameMode();
             gameBoard.aiGame = true;
+            newRoundButton();
             showPlayArea();
             showRestartButton();
             gameBoard.displayBoard();
         })
     }
 
+    //creates the players by calling the player factory function
     const createPlayers = () => {
         let player1Name = document.getElementById('player-1').value;
         let player2Name = document.getElementById('player-2').value;
@@ -316,29 +339,34 @@ const displayController = (() => {
         }
     }
 
+    //starts a PVP game
     const startHumanGame = () => {
         let startHumanGameButton = document.querySelector('#start-button');
         startHumanGameButton.addEventListener('click', () => {
             createPlayers();
             showPlayArea();
             showRestartButton();
+            newRoundButton();
             gameBoard.displayBoard();
         })
+    }
+
+    const gameInit = () => {
+        displayController.showPlayerInput();
+        displayController.startAIGame();
+        displayController.startHumanGame();
+        displayController.restart();
     }
 
     return {showPlayerInput, 
             startAIGame, 
             startHumanGame, 
             restart,
+            showWinner,
+            gameInit,
             player1NameDisplay, 
             player2NameDisplay}
 })();
 
-displayController.showPlayerInput();
-displayController.startAIGame();
-displayController.startHumanGame();
-displayController.restart();
+displayController.gameInit();
 
-
-
-//problem: two gamearrays are getting created. I think I need to use the this keyword
