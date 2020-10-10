@@ -246,7 +246,6 @@ const player = (name, marker) => {
             displayController.showWinner();
             let winDisplay = document.querySelector('#winner-display');
             winDisplay.textContent = `${name} wins!`;
-            gameBoard.restartGame();
         }, 250);
     }
 
